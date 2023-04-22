@@ -3,10 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rodaine/table"
+	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 )
 
@@ -33,17 +33,28 @@ type uhPair struct {
 	Host string `json:"host,omitempty"`
 }
 
+func (r *uhPair) eq(pair uhPair) bool {
+	return r.User == pair.User && r.Host == pair.Host
+}
+
 type dataS struct {
 	Data []record
 }
 
-/*type dataI interface {
-	read()
-	add(data record)
-	delete(data uhPair)
-	log()
-}*/
-
+/*
+	type dataI interface {
+		read()
+		add(data record)
+		delete(data uhPair)
+		log()
+	}
+*/
+func (d *dataS) rewriteFile() {
+	dataJSON, err := json.Marshal(d.Data)
+	logError(err)
+	err = os.WriteFile(dataPath, dataJSON, 0777)
+	logError(err)
+}
 func (d *dataS) read() {
 	dataJSON, err := os.ReadFile(dataPath)
 	if err != nil {
@@ -53,25 +64,19 @@ func (d *dataS) read() {
 	if len(dataJSON) == 0 {
 		dataJSON = []byte("[]")
 	}
-	//dataJSON, err := io.ReadAll(&dataFile)
-	//dataJSON, err := io.ReadAll(&dataFile)
-	//fmt.Println(dataJSON, dataFile)
-
 	logError(json.Unmarshal(dataJSON, &d.Data))
 }
 func (d *dataS) add(data record) {
 	d.Data = append(d.Data, data)
-
-	dataJSON, err := json.Marshal(d.Data)
-	logError(err)
-	//_, err = dataFile.Write(dataJSON)
-	err = os.WriteFile(dataPath, dataJSON, 0644)
-	logError(err)
+	d.rewriteFile()
 }
 func (d *dataS) delete(data uhPair) (deleted bool) {
 	for i, el := range d.Data {
-		if reflect.DeepEqual(uhPair{el.User, el.Host}, data) {
+		if data.eq(uhPair{el.User, el.Host}) {
+			fmt.Println(d.Data[:i])
+			fmt.Println(d.Data[i+1:])
 			d.Data = append(d.Data[:i], d.Data[i+1:]...)
+			d.rewriteFile()
 			return true
 		}
 	}
@@ -79,16 +84,26 @@ func (d *dataS) delete(data uhPair) (deleted bool) {
 }
 func (d *dataS) log() {
 	// github.com/jedib0t/go-pretty/v6/table
-	tbl := table.New("data", "user", "@", "host")
-	tbl.WithPadding(3)
 	if len(tokensData.Data) == 0 {
 		fmt.Println("No data found")
 		return
 	}
+
+	t := table.NewWriter()
+	t.SetStyle(table.StyleLight)
+	t.Style().Options.DrawBorder = false
+	t.Style().Options.SeparateColumns = false
+	t.AppendHeader(table.Row{"data", "user", text.FgHiWhite.Sprint(delitmer), "host"})
 	for _, data := range tokensData.Data {
-		tbl.AddRow(data.Data, data.User, delitmer, data.Host)
+		t.AppendRow(table.Row{data.Data, data.User, text.FgHiWhite.Sprint(delitmer), data.Host})
 	}
-	tbl.Print()
+	t.SetColumnConfigs([]table.ColumnConfig{
+		{Number: 1, Align: text.AlignLeft, AlignFooter: text.AlignLeft, AlignHeader: text.AlignCenter},
+		{Number: 2, Align: text.AlignRight, AlignFooter: text.AlignRight, AlignHeader: text.AlignRight},
+		{Number: 3, Align: text.AlignCenter, AlignFooter: text.AlignCenter, AlignHeader: text.AlignCenter},
+		{Number: 4, Align: text.AlignLeft, AlignFooter: text.AlignLeft, AlignHeader: text.AlignLeft},
+	})
+	fmt.Println(t.Render())
 }
 
 func init() {
@@ -119,13 +134,18 @@ func main() {
 			User: os.Args[2][spaceIndex+1 : atIndex],
 			Host: os.Args[2][atIndex+1:],
 		})
+		fmt.Println(text.FgGreen.Sprint("Added"))
 		return
-	} else if os.Args[1] == "--delete" || os.Args[1] == "-d" {
+	} else if os.Args[1] == "--del" || os.Args[1] == "-d" {
 		atIndex := strings.Index(os.Args[2], "@")
-		tokensData.delete(uhPair{
+		if tokensData.delete(uhPair{
 			User: os.Args[2][:atIndex],
 			Host: os.Args[2][atIndex+1:],
-		})
+		}) {
+			fmt.Println(text.FgGreen.Sprint("Deleted"))
+		} else {
+			fmt.Println(text.FgRed.Sprint("Not found record with user: "))
+		}
 		return
 	}
 }

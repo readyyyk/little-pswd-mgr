@@ -40,7 +40,7 @@
 </ol>
 
 ```bash
-echo -e "\n$(printf 'PATH=\"$PATH:%s\"' $(pwd))\n" >> ~/.bashrc
+echo -e "\n$(printf 'PATH=\"$PATH:%s\"' $(pwd))\n" >> ~/.bashrc | source ~/.bashrc
 ```
 
 > or change `$(pwd)` to your installation path

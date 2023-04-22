@@ -1,25 +1,42 @@
-<img src="assets/Snap.png">
+<img src="./assets/Span.png">
 
 # Examples
 
-> `tokens`
+> ``` bash
+> tokens
 > ```
-> data                  user         host                   
-> fghjasjdnaskjndk      qwiebb   @   129837.12.31.23.12.3   
-> YXBzLG1rZmRkYXNkbmp   readyk   @   example.com            
-> YXNkbmppazEyMwo       admin    @   localhost
+> Output:
+>
+> ```
+> DATA  USER  @  HOST           
+> ───────────────────────────────
+> 123   test  @  todooos.live   
+> qwe    zxc  @  localhost:5541
+> root  root  @  localhost
 > ``` 
 
 
-> `tokens --add "my_password qwerty@github.com`
+> ``` bash
+> tokens --add "my_password qwerty@github.com"
+> ```
+> `Added`
 
-> `tokens --del "qwerty@github.com`
+> ``` bash
+> tokens --del raeadyyyk@github.com"
+> ```
+> Output:
+>
+> `Deleted`
+> 
+> or
+> 
+> `Not found record with user: raeadyyyk for host: github.com`
 
 # Installation
 
 <ol>
-   <li> download latest binary from <code>realises</code> </li>
-   <li> to create executable accessible from anywhere type: </li>
+   <li> download latest binary from <code><a href="https://github.com/readyyyk/little-pswd-mgr/releases">realises</a></code> </li>
+   <li> to make <code>tokens</code> accessible from anywhere type: </li>
 </ol>
 
 ```bash
@@ -27,7 +44,7 @@ echo -e "\n$(printf 'PATH=\"$PATH:%s\"' $(pwd))\n" >> ~/.bashrc
 ```
 
 > or change `$(pwd)` to your installation path
-> > `$pwd` pastes your current directory 
+> > `pwd` pastes your current terminal directory 
 
 # Usage
 
@@ -35,4 +52,9 @@ echo -e "\n$(printf 'PATH=\"$PATH:%s\"' $(pwd))\n" >> ~/.bashrc
 |-------------------|------------------------|-----------------|----|
 | <no flag\>        |                        | logs saved data |    |
 | `-a` _or_ `--add` | "`data` `user`@`host`" | adds new        |    |
-| `-d` _or_ `--del` | `user`@`host`          | deletes one     | 🚨 |
+| `-d` _or_ `--del` | `user`@`host`          | deletes one     |    |
+
+# TODO
+
+- `--help`
+- sort records with `-s` `user=test` `host=github.com`

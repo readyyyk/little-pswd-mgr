@@ -73,8 +73,6 @@ func (d *dataS) add(data record) {
 func (d *dataS) delete(data uhPair) (deleted bool) {
 	for i, el := range d.Data {
 		if data.eq(uhPair{el.User, el.Host}) {
-			fmt.Println(d.Data[:i])
-			fmt.Println(d.Data[i+1:])
 			d.Data = append(d.Data[:i], d.Data[i+1:]...)
 			d.rewriteFile()
 			return true
@@ -83,9 +81,8 @@ func (d *dataS) delete(data uhPair) (deleted bool) {
 	return false
 }
 func (d *dataS) log() {
-	// github.com/jedib0t/go-pretty/v6/table
 	if len(tokensData.Data) == 0 {
-		fmt.Println("No data found")
+		fmt.Println(text.FgRed.Sprint("No data found"))
 		return
 	}
 
@@ -126,7 +123,6 @@ func main() {
 	}
 
 	if os.Args[1] == "--add" || os.Args[1] == "-a" {
-		fmt.Println(len(os.Args[2]))
 		spaceIndex := strings.Index(os.Args[2], " ")
 		atIndex := strings.Index(os.Args[2], "@")
 		tokensData.add(record{
@@ -138,14 +134,17 @@ func main() {
 		return
 	} else if os.Args[1] == "--del" || os.Args[1] == "-d" {
 		atIndex := strings.Index(os.Args[2], "@")
-		if tokensData.delete(uhPair{
+		data := uhPair{
 			User: os.Args[2][:atIndex],
 			Host: os.Args[2][atIndex+1:],
-		}) {
+		}
+		if tokensData.delete(data) {
 			fmt.Println(text.FgGreen.Sprint("Deleted"))
 		} else {
-			fmt.Println(text.FgRed.Sprint("Not found record with user: "))
+			fmt.Println(text.FgRed.Sprint("Not found record with user: ") + text.BgHiBlue.Sprint(data.User) + text.FgRed.Sprint(" for host: ") + text.BgHiBlue.Sprint(data.Host))
 		}
 		return
+	} else if os.Args[1] == "--help" || os.Args[1] == "-h" {
+
 	}
 }

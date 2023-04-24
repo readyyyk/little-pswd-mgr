@@ -20,7 +20,8 @@ var delitmer = "@"
 var dataPath = "/.tokens"
 
 var tokensData dataS
-var dataFile os.File
+
+//var dataFile os.File
 
 type record struct {
 	Data string `json:"data"`
@@ -80,8 +81,8 @@ func (d *dataS) delete(data uhPair) (deleted bool) {
 	}
 	return false
 }
-func (d *dataS) log() {
-	if len(tokensData.Data) == 0 {
+func logData(dataSet []record) {
+	if len(dataSet) == 0 {
 		fmt.Println(text.FgRed.Sprint("No data found"))
 		return
 	}
@@ -90,9 +91,9 @@ func (d *dataS) log() {
 	t.SetStyle(table.StyleLight)
 	t.Style().Options.DrawBorder = false
 	t.Style().Options.SeparateColumns = false
-	t.AppendHeader(table.Row{"data", "user", text.FgHiWhite.Sprint(delitmer), "host"})
-	for _, data := range tokensData.Data {
-		t.AppendRow(table.Row{data.Data, data.User, text.FgHiWhite.Sprint(delitmer), data.Host})
+	t.AppendHeader(table.Row{"data", "user", text.FgHiBlack.Sprint(delitmer), "host"})
+	for _, data := range dataSet {
+		t.AppendRow(table.Row{data.Data, data.User, text.FgHiBlack.Sprint(delitmer), data.Host})
 	}
 	t.SetColumnConfigs([]table.ColumnConfig{
 		{Number: 1, Align: text.AlignLeft, AlignFooter: text.AlignLeft, AlignHeader: text.AlignCenter},
@@ -102,26 +103,37 @@ func (d *dataS) log() {
 	})
 	fmt.Println(t.Render())
 }
+func logHelp() {
+	tempHelpData := table.NewWriter()
+	tempHelpData.Style().Options.DrawBorder = false
+	tempHelpData.Style().Options.SeparateColumns = false
+	tempHelpData.Style().Options.SeparateHeader = false
+	tempHelpData.AppendRows([]table.Row{
+		{"\t<no flag>", "shows all your stored data"}, {""},
+		{"\t-h, --help", `shows this message`}, {""},
+		{"\t-a, --add", "adds new record, after space provide information you want to save\nin format " + `"<data> <user>@<host>"`}, {""},
+		{"\t-d, --del", "deletes record with provided credentials, after space provide\ncredentials of record you want to delete in format <user>@<host>"}, {""},
+		{"\t-s, --sort", "shows only strings that contain provided data"},
+	})
+	fmt.Println(tempHelpData.Render())
+}
 
 func init() {
 	e, _ := os.Executable()
 	dataPath = filepath.Dir(e) + dataPath
 
-	//tempFile, err := os.OpenFile(dataPath, os.O_APPEND|os.O_WRONLY|os.O_CREATE|os.O_RDONLY, os.ModePerm)
-	//if err != nil {
-	//	tempFile, _ = os.Create(dataPath)
-	//	_, _ = tempFile.Write([]byte("[{}]"))
-	//}
-	//dataFile = *tempFile
-
 	tokensData.read()
 }
 func main() {
 	if len(os.Args) == 1 {
-		tokensData.log()
+		logData(tokensData.Data)
 		return
 	}
 
+	if os.Args[1] == "--help" || os.Args[1] == "-h" {
+		logHelp()
+		return
+	}
 	if os.Args[1] == "--add" || os.Args[1] == "-a" {
 		spaceIndex := strings.Index(os.Args[2], " ")
 		atIndex := strings.Index(os.Args[2], "@")
@@ -132,8 +144,13 @@ func main() {
 		})
 		fmt.Println(text.FgGreen.Sprint("Added"))
 		return
-	} else if os.Args[1] == "--del" || os.Args[1] == "-d" {
+	}
+	if os.Args[1] == "--del" || os.Args[1] == "-d" {
 		atIndex := strings.Index(os.Args[2], "@")
+		if atIndex == -1 {
+			fmt.Println(text.FgRed.Sprint("provide valid data"))
+			return
+		}
 		data := uhPair{
 			User: os.Args[2][:atIndex],
 			Host: os.Args[2][atIndex+1:],
@@ -144,7 +161,29 @@ func main() {
 			fmt.Println(text.FgRed.Sprint("Not found record with user: ") + text.BgHiBlue.Sprint(data.User) + text.FgRed.Sprint(" for host: ") + text.BgHiBlue.Sprint(data.Host))
 		}
 		return
-	} else if os.Args[1] == "--help" || os.Args[1] == "-h" {
+	}
+	if os.Args[1] == "--sort" || os.Args[1] == "-s" {
+		if len(os.Args) < 3 {
+			fmt.Println(text.FgRed.Sprint("Provide data to sort (any string)"))
+			return
+		}
 
+		var dataSet []record
+		for _, el := range tokensData.Data {
+			if strings.Contains(el.Data, os.Args[2]) || strings.Contains(el.User, os.Args[2]) || strings.Contains(el.Host, os.Args[2]) {
+				if strings.Contains(el.Data, os.Args[2]) {
+					el.Data = text.FgHiBlue.Sprint(el.Data)
+				}
+				if strings.Contains(el.User, os.Args[2]) {
+					el.User = text.FgHiBlue.Sprint(el.User)
+				}
+				if strings.Contains(el.Host, os.Args[2]) {
+					el.Host = text.FgHiBlue.Sprint(el.Host)
+				}
+				dataSet = append(dataSet, el)
+			}
+		}
+		logData(dataSet)
+		return
 	}
 }

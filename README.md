@@ -1,14 +1,4 @@
-<div style="display: grid;grid-template-columns: 50% 50%; background: #ABB8C3">
-    <div style="display: flex; flex-direction: column">
-        <img src="assets/Add.png" alt="adding records">
-        <img src="assets/DeleteError.png" alt="error while deleting">
-        <img src="assets/Sort.png" alt="log sorted data">
-    </div>
-    <div style="display: flex; flex-direction: column; justify-content: center">
-        <img src="assets/Log.png" alt="logged data">
-        <img src="assets/Delete.png" alt="deleting record">
-    </div>
-</div>
+<img src="assets/Snap.gif" alt="example gif used asciinema.org and asciinema/agg">
 
 # Installation
 <ol>
@@ -57,7 +47,7 @@ echo -e "\n$(printf 'PATH=\"$PATH:%s\"' $(pwd))\n" >> ~/.bashrc | source ~/.bash
 > ```
 > Output:
 >
-> `<help output>` 
+> `<help output>`
 
 ### Log sorted data
 > ``` bash
@@ -83,7 +73,7 @@ echo -e "\n$(printf 'PATH=\"$PATH:%s\"' $(pwd))\n" >> ~/.bashrc | source ~/.bash
 > tokens -a "my_password qwerty@github.com"
 > ```
 > Output:
-> 
+>
 > `Added`
 
 ### Deletion
@@ -96,9 +86,9 @@ echo -e "\n$(printf 'PATH=\"$PATH:%s\"' $(pwd))\n" >> ~/.bashrc | source ~/.bash
 > Output:
 >
 > `Deleted`
-> 
+>
 > or
-> 
+>
 > `Not found record with user: raeadyyyk for host: github.com`
 
 # TODO

@@ -135,8 +135,17 @@ func main() {
 		return
 	}
 	if os.Args[1] == "--add" || os.Args[1] == "-a" {
+		if len(os.Args) < 3 {
+			fmt.Println(text.FgRed.Sprint("Provide data in format '<data> <user>@<host>'"))
+		}
+
 		spaceIndex := strings.Index(os.Args[2], " ")
 		atIndex := strings.Index(os.Args[2], "@")
+
+		if spaceIndex == -1 || atIndex == -1 {
+			fmt.Println(text.FgRed.Sprint("Provide data in valid format '<data> <user>@<host>'"))
+		}
+
 		tokensData.add(record{
 			Data: os.Args[2][:spaceIndex],
 			User: os.Args[2][spaceIndex+1 : atIndex],
@@ -146,9 +155,13 @@ func main() {
 		return
 	}
 	if os.Args[1] == "--del" || os.Args[1] == "-d" {
+		if len(os.Args) < 3 {
+			fmt.Println(text.FgRed.Sprint("Provide data in format <user>@<host>"))
+		}
+
 		atIndex := strings.Index(os.Args[2], "@")
 		if atIndex == -1 {
-			fmt.Println(text.FgRed.Sprint("provide valid data"))
+			fmt.Println(text.FgRed.Sprint("Provide data in valid format <user>@<host>"))
 			return
 		}
 		data := uhPair{
@@ -186,4 +199,5 @@ func main() {
 		logData(dataSet)
 		return
 	}
+	fmt.Println(text.FgRed.Sprintf("Unrecognized option '%s'", os.Args[1]))
 }

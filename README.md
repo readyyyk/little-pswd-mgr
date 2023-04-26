@@ -7,11 +7,27 @@
 </ol>
 
 ```bash
-echo -e "\n$(printf 'PATH=\"$PATH:%s\"' $(pwd))\n" >> ~/.bashrc | source ~/.bashrc
+$ chmod 777 tokens
+$ echo -e "\n$(printf 'PATH=\"$PATH:%s\"' $(pwd))\n" >> ~/.bashrc | source ~/.bashrc
 ```
 
 > or change `$(pwd)` to your installation path
 > > `pwd` pastes your current terminal directory
+
+### Custom make
+```bash
+git clone https://github.com/readyyyk/little-pswd-mgr
+```
+```bash
+cd little-pswd-mgr
+```
+```bash
+make
+```
+```bash
+sudo make install
+``` 
+
 
 # Usage
 

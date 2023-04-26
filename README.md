@@ -7,6 +7,8 @@
 </ol>
 
 ```bash
+$ # rename executable you downloaded to "tokens"
+$ mv tokens-linux-amd64 tokens # example
 $ chmod 777 tokens
 $ echo -e "\n$(printf 'PATH=\"$PATH:%s\"' $(pwd))\n" >> ~/.bashrc | source ~/.bashrc
 ```

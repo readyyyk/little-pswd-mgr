@@ -110,4 +110,6 @@ sudo make install
 > `Not found record with user: raeadyyyk for host: github.com`
 
 # TODO
-- Encrypt data file
+- refactor everything...
+- add password input
+- encryption for data file

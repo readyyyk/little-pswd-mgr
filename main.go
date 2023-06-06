@@ -10,6 +10,13 @@ import (
 	"strings"
 )
 
+/*
+	TODO:
+		- refactor everything...
+		- add password input
+		- encryption for data file
+*/
+
 func logError(err error) {
 	if err != nil {
 		panic(err)
@@ -140,10 +147,11 @@ func main() {
 		}
 
 		spaceIndex := strings.Index(os.Args[2], " ")
-		atIndex := strings.Index(os.Args[2], "@")
+		atIndex := strings.LastIndex(os.Args[2], "@")
 
 		if spaceIndex == -1 || atIndex == -1 {
 			fmt.Println(text.FgRed.Sprint("Provide data in valid format '<data> <user>@<host>'"))
+			return
 		}
 
 		tokensData.add(record{
@@ -157,9 +165,10 @@ func main() {
 	if os.Args[1] == "--del" || os.Args[1] == "-d" {
 		if len(os.Args) < 3 {
 			fmt.Println(text.FgRed.Sprint("Provide data in format <user>@<host>"))
+			return
 		}
 
-		atIndex := strings.Index(os.Args[2], "@")
+		atIndex := strings.LastIndex(os.Args[2], "@")
 		if atIndex == -1 {
 			fmt.Println(text.FgRed.Sprint("Provide data in valid format <user>@<host>"))
 			return
